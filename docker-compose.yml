@@ -1,0 +1,42 @@
+version: '2'
+services:
+
+  # Interface for building Graphs of the Data in Elasticsearch
+  kibana:
+    build: build/kibana
+    restart: always
+    depends_on: 
+      - elasticsearch-master
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "docker.kibana"
+        fluentd-async-connect: "true"
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+      NODE_OPTIONS: "--max-old-space-size=200"
+    links:
+      - elasticsearch-master:elasticsearch
+    networks:
+      - main
+
+  # Curator used to auto-trim elasticsearch data
+  elasticsearch-curator:
+    image: visity/elasticsearch-curator
+    depends_on: 
+      - elasticsearch
+    restart: always
+    environment: 
+      INTERVAL_IN_HOURS: 24
+      OLDER_THAN_IN_DAYS: "7"
+    links:
+      - elasticsearch:es1
+    networks:
+      - main
+
+networks:
+  main:
+

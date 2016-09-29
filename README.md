@@ -1,2 +1,2 @@
-# docker-azure-kibana
-Azure Kibana Install
+# Kibana Docker Container
+###### Customized Docker Container containing Kibana for use in Azure
