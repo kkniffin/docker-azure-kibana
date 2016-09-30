@@ -10,5 +10,5 @@ fi
 # Set Variables
 export ES_SERVER="${ES_SERVER:-1.1.1.1}"
 export FLUENTD_SERVER="${FLUENTD_SERVER:-1.1.1.1}"
-
+export DOCKER_VOLUMES_DIR="${DOCKER_VOLUMES_DIR:-/opt/docker_data}"
 docker-compose "$@"

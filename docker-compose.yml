@@ -25,11 +25,43 @@ services:
   elasticsearch-curator:
     image: visity/elasticsearch-curator
     restart: always
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "${FLUENTD_SERVER}:24224"
+        tag: "docker.es-curator"
+        fluentd-async-connect: "true"
     environment: 
       INTERVAL_IN_HOURS: 24
       OLDER_THAN_IN_DAYS: "7"
     extra_hosts:
       - "elasticsearch:${ES_SERVER}"
+    networks:
+      - main
+
+  # Elastic Alerting Program for sending out Emails
+  elastalert:
+    image: rrspyder/elastalert-docker
+    cap_add:
+      - SYS_TIME
+      - SYS_NICE
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "${FLUENTD_SERVER}:24224"
+        tag: "docker.elastalert"
+        fluentd-async-connect: "true"
+    restart: always
+    environment:
+      SET_CONTAINER_TIMEZONE: "true"
+      CONTAINER_TIMEZONE: "America/New_York"
+      ELASTICSEARCH_USER: elastic
+      ELASTICSEARCH_PASSWORD: changeme
+    volumes:
+      - ${DOCKER_VOLUMES_DIR}/docker-elk/elastalert/rules:/opt/rules
+    extra_hosts:
+      - "elasticsearch:${ES_SERVER}"
+      - "elasticsearch_host:${ES_SERVER}"
     networks:
       - main
 
